@@ -1,0 +1,14 @@
+package com.miguel.assistencesystem.application.validation.employee;
+
+import java.util.regex.Pattern;
+
+public class PasswordValidator {
+    private static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%&()]).{8,20}$";
+    private static final Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
+
+    private PasswordValidator() {}
+    
+    public static boolean isValid(String password) {
+        return pattern.matcher(password).matches();
+    }
+}
