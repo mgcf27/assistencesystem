@@ -1,24 +1,24 @@
-package com.miguel.assistencesystem.infrastructure.security.session;
+package com.miguel.assistencesystem.application.security;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.miguel.assistencesystem.infrastructure.config.SecuritySessionProperties;
 import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
+import com.miguel.assistencesystem.infrastructure.security.session.AuthenticatedSessionView;
+import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationTokenDAO;
 
 @Component
 public class SessionManager {
     private final AuthenticationTokenDAO tokenDAO;
-    private final SecuritySessionProperties sessionProperties;
+    private final SessionService sessionService;
 
     public SessionManager(
             AuthenticationTokenDAO tokenDAO,
-            SecuritySessionProperties sessionProperties) {
+            SessionService sessionService) {
         this.tokenDAO = tokenDAO;
-        this.sessionProperties = sessionProperties;
+        this.sessionService = sessionService;
     }
 
     public Optional<AuthenticatedIdentity> resolveIdentityFromToken(String token) {
@@ -27,7 +27,7 @@ public class SessionManager {
         return loadSession(token)
         		.filter(session -> validateSession(session,now))
         		.map(session -> {
-        			applySlidingPolicy(session,now);
+        			sessionService.applySlidingIfNeeded(session, now);
         			return session;})
         		.map(this::buildIdentity);
     }    
@@ -43,23 +43,8 @@ public class SessionManager {
     	return !session.revoked() && now.isBefore(session.expiresAt());
     }
 
-    private void applySlidingPolicy(
-    		AuthenticatedSessionView session,
-    		LocalDateTime now
-    		) {
-        Duration remainingLifetime =
-                Duration.between(now, session.expiresAt());
-
-        if (remainingLifetime.compareTo(sessionProperties.refreshThreshold()) <= 0) {
-
-            Optional<AuthenticationToken> token = tokenDAO.findByToken(session.token());
-                    
-            token.ifPresent(t-> t.extendExpiration(sessionProperties.timeout()));
-        }
-    }
-
+   
     private AuthenticatedIdentity buildIdentity(AuthenticatedSessionView session) {
-
         return new AuthenticatedIdentity(
                 session.employeeId(),
                 session.email(),
