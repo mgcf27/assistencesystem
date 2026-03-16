@@ -11,3 +11,4 @@ public record AuthenticatedSessionView(
 		String token,
 		LocalDateTime expiresAt,
 		boolean revoked) {}
+

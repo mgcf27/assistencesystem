@@ -48,8 +48,7 @@ public class AuthenticationTokenDAO extends BaseDAO<AuthenticationToken, Long> {
                 .stream()
                 .findFirst();
     }
-    
-    
+     
     public int deleteExpiredOrRevoked(LocalDateTime now) {
 
         return em.createQuery("""

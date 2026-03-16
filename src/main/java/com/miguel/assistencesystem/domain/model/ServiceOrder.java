@@ -33,13 +33,13 @@ public class ServiceOrder {
     	    length = 30)
     private String protocolNumber;
 	
-	@Column(name = "problemDescription")
+	@Column(name = "problem_description")
 	private String problemDescription;
 
-	@Column(name = "openedAt", nullable = false)
+	@Column(name = "opened_at", nullable = false)
 	private LocalDateTime openedAt;
 
-	@Column(name = "closedAt", nullable = true)
+	@Column(name = "closed_at", nullable = true)
 	private LocalDateTime closedAt;
 
 	@Enumerated(EnumType.STRING)

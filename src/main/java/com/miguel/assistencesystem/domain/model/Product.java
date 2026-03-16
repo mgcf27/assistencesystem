@@ -17,19 +17,19 @@ public class Product {
     private Client client;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "identification_status", nullable = false)
     private ProductIdentificationStatus identificationStatus;
 
     @Column(nullable = false, length = 100)
     private String model; // description at first, precise later
 
-    @Column(length = 100)
+    @Column(name = "commercial_model",length = 100)
     private String commercialModel;
 
-    @Column(length = 50)
+    @Column(name = "manufacturer_code",length = 50)
     private String manufacturerCode;
 
-    @Column(unique = true, length = 50)
+    @Column(name = "serial_number",unique = true, length = 50)
     private String serialNumber;
 
     @Column(length = 20)
