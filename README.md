@@ -1,163 +1,291 @@
-# Assistance System Backend
+🔧 Assistance System Backend
+Backend system for managing service orders in a technical assistance environment (appliance repair, warranty service, etc.).
 
-Backend system for managing service orders in a technical assistance environment (appliance repair, warranty service, etc.).  
-Built with a focus on **clean architecture**, **domain modeling**, and **production-grade backend design practices**.
+This project is being developed as a deep learning exercise in backend engineering, focusing on how systems actually work under the hood rather than relying on framework abstractions.
 
-> 🚧 This repository is actively under development. Some parts are still evolving and the codebase may change as architectural decisions are refined.
+⚠️ Active Development — This project is actively being developed. Some parts of the system are still evolving, and the codebase may undergo refactoring as architectural decisions are refined. Documentation and comments are still incomplete.
 
----
+🎯 Project Goals
+This project was built to understand and practice:
 
-## 🎯 Project Goals
+-Domain-driven design (DDD) concepts
 
-This project was created to practice and demonstrate:
+-Layered architecture
 
-- Domain-driven design concepts
-- Layered architecture
-- Explicit persistence management with JPA/Hibernate
-- Custom authentication system (without Spring Security auto-configuration)
-- Session-based authentication with **sliding expiration**
-- Clear separation between domain, application, and infrastructure layers
+-Manual persistence with JPA/Hibernate
 
-The goal is not just functionality, but understanding **how backend systems are structured in professional environments**.
+-Authentication system design (without Spring Security auto-configuration)
 
----
+-Session lifecycle management (login, logout, expiration, sliding)
 
-## 🛠️ Tech Stack
+-**Clear separation of responsibilities across layers**
 
-- **Java** 17
-- **Spring Boot**
-- **Hibernate / JPA**
-- **PostgreSQL**
-- **Flyway** (database migrations)
-- **REST API**
+The focus is not just building features, but understanding where logic belongs, how layers interact, and how persistence and authentication really behave.
 
-> Persistence is handled manually using `EntityManager` and DAOs — no Spring Data repositories — to better understand how JPA actually works.
+🛠️ Tech Stack
+Language:	Java 
+Framework:	Spring Boot
+Persistence:	Hibernate / JPA (manual via EntityManager)
+Database:	PostgreSQL
+Migrations:	Flyway
+API	REST
+Persistence is handled through custom DAOs, without Spring Data repositories, to maintain explicit control over queries and entity lifecycle.
 
----
+🏗️ Architecture
+The system follows a layered architecture with strong DDD influence:
 
-## 🏗️ Architecture
+-Domain  ← Business concepts & rules
 
-The system follows a layered architecture with explicit boundaries:
-┌─────────────────┐
-│ Domain │          ← Business model and core concepts
-├─────────────────┤
-│ Application │     ← Use case orchestration
-├─────────────────┤
-│ Infrastructure │  ← Technical implementation (web, persistence, security)
-└─────────────────┘
+-Application  ← Use-case orchestration
 
+-Infrastructure   ← Technical implementation
+
+**This is a pragmatic layered design, not strict Clean Architecture or Hexagonal Architecture.**
+
+Application services interact directly with DAOs instead of using repository interfaces. This decision was intentional to keep the system explicit and easier to reason about while learning.
+
+📦 Domain Layer
+Contains business concepts and rules.
+
+Examples:
+
+-Client, Product, ServiceOrder
+
+-EmployeeAccount, EmployeeRole
+
+-AuthenticationFailureReason
+
+Responsibilities:
+
+-Enforce invariants
+
+-Model business state transitions
+
+-Represent core domain concepts
+
+✅ No framework dependencies.
+
+⚙️ Application Layer
+Contains use-case orchestration.
+
+Examples:
+
+-AuthenticationService
+
+-EmployeeAccountService
+
+-ClientService, ProductService, ServiceOrderService
+
+-SessionManager, SessionService
+
+Responsibilities:
+
+-Coordinate domain entities
+
+-Enforce workflows
+
+-Interact with persistence layer
+
+-Apply session and authentication policies
+
+**The application layer is where most of the system behavior is defined.**
+
+🧱 Infrastructure Layer
+Contains technical implementation details.
+
+Examples:
+
+-REST controllers
+
+-AuthenticationFilter
+
+-DAOs (EntityManager-based)
+
+-Password hashing (BCrypt)
+
+-Authentication token persistence
+
+-Configuration classes
+
+Responsibilities:
+
+-HTTP handling
+
+-Persistence implementation
+
+-Security mechanisms
+
+-Framework integration
+
+🔐 Authentication System
+Authentication was implemented from scratch, without relying on Spring Security auto-configuration.
+
+The system uses database-backed opaque tokens.
+
+Login Flow
+
+AuthenticationController
+        ↓
+AuthenticationService
+        ↓
+CredentialVerifier
+        ↓
+PasswordHasher
+        ↓
+TokenGenerator
+        ↓
+AuthenticationToken persisted
+The client receives a token and sends it in every request:
+
+
+Authorization: Bearer <token>
+Request Authentication Pipeline
 text
+HTTP Request
+    ↓
+AuthenticationFilter
+    ↓
+SessionManager
+    ↓
+SessionService (transactional)
+    ↓
+AuthenticatedIdentity
+    ↓
+AuthenticationContext (ThreadLocal)
+    ↓
+Application Services
+🕒 Session Management
+Sessions are stored in the authentication_tokens database table.
 
-### 📦 Domain
-Contains the business model and core concepts:
-- `EmployeeAccount`, `EmployeeRole`
-- `Client`, `Product`, `ServiceOrder`
-- Domain exceptions and value objects
+Fields:
 
-> ✅ No framework dependencies here.
+-token
 
-### ⚙️ Application
-Contains use case orchestration:
-- `AuthenticationService`
-- `EmployeeAccountService`
-- `ClientService`, `ProductService`, `ServiceOrderService`
+-employee_account_id
 
-**Responsibilities:**
-- Orchestrating domain objects
-- Coordinating infrastructure services
-- Enforcing application workflows
+-expires_at
 
-### 🧱 Infrastructure
-Contains technical implementation details:
-- REST controllers
-- Authentication filter
-- Persistence DAOs
-- Password hashing
-- Session management
-- Configuration classes
+-revoked
 
-> Infrastructure depends on `application` and `domain`, but not the other way around.
+✅ Features Implemented
+-Login
 
----
+-Logout (token revocation)
 
-## 🔐 Authentication System
+-Sliding session expiration
 
-Authentication was implemented **from scratch** instead of relying on Spring Security auto-configuration.
+-Scheduled cleanup of expired sessions
 
-The system uses **database-backed opaque tokens** with **sliding session expiration**.
+-Thread-local authentication context
 
-### Authentication Flow:
-Login request
-↓
-Credential verification
-↓
-Token generation
-↓
-Token stored in database
-↓
-Client sends token in Authorization header
-↓
-Authentication filter resolves identity
-↓
-Identity stored in request context
+🔄 Sliding Expiration
+Session expiration is dynamically extended based on activity.
 
-text
+Configuration:
 
-### ✅ Features implemented:
-- Login
-- Logout (token revocation)
-- Sliding session expiration
-- Session cleanup job
-- Thread-local authentication context
-- Role-based authorization checks
+-timeout = 30 minutes
 
----
+-refreshThreshold = 10 minutes
 
-## 📌 Current Status
+Behavior:
 
-The project is actively being developed.
+If remaining lifetime ≤ 10 minutes → extend expiration to now + 30 minutes
 
-### ✅ Completed features:
-- Client management
-- Product registration
-- Service order lifecycle
-- Custom authentication system
-- Session persistence
-- Sliding session expiration
-- Cleanup job for expired sessions
+This update is executed inside a transactional service, ensuring Hibernate dirty checking persists the change correctly.
 
-### 🚧 Work in progress:
-- Auditing support
-- Additional architectural refinements
-- Further validation and testing
-- Documentation and code comments
+⚡ Query Optimization
+Session resolution uses projection queries to avoid unnecessary entity loading.
 
-> Because the project is evolving, some parts of the code may still be incomplete or subject to refactoring.
+Flow:
 
----
+load session projection
+    ↓
+validate session
+    ↓
+only load entity if refresh is required
+This reduces database load during normal requests.
 
-## 📖 Project Purpose
+📊 Command / Query Separation
+The system follows a CQRS-style structure:
 
-This repository serves as a **learning and experimentation environment** for building backend systems with **proper architecture** — rather than relying entirely on framework abstractions.
+Command services → mutations
 
-The focus is understanding:
-- Where logic belongs
-- How layers interact
-- How authentication and persistence really work internally
+Query services → reads
 
----
+Only command services modify state.
 
-## 📝 Notes
+This separation simplifies reasoning about:
 
-- The project currently prioritizes architecture over documentation
-- Comments and additional documentation will be added progressively
-- Some features may still be under active refactoring
+-Business operations
 
----
+-Auditing
 
-## 🧑‍💻 Author
+-System behavior
 
-**mgcf27** 
+📌 Current Status
+✅ Implemented
+Client management
 
----
+Product management
 
+Service order lifecycle
+
+Employee account management
+
+Custom authentication system
+
+Token persistence
+
+Logout
+
+Sliding session expiration
+
+Scheduled cleanup job
+
+Concurrency-safe session handling
+
+🚧 In Progress
+Audit logging for mutation operations
+
+Additional architectural refinements
+
+Improved validation
+
+Documentation and comments
+
+💭 Project Philosophy
+This project intentionally avoids hiding complexity behind frameworks.
+
+Instead, it focuses on:
+
+Understanding first, abstraction later
+
+The goal is to build a strong mental model of:
+
+Persistence behavior
+
+Transaction boundaries
+
+Authentication flow
+
+Architectural decisions
+
+📝 Notes
+Code is still evolving and may change
+
+Some features are not fully implemented yet
+
+Documentation will be improved over time
+
+🏁 Final Remark
+This project is less about delivering a finished product and more about developing a deep understanding of backend systems.
+
+Most of the value comes from the process:
+
+Questioning decisions
+
+Refining architecture
+
+Understanding trade-offs
+
+👨‍💻 Author: mgcf27
