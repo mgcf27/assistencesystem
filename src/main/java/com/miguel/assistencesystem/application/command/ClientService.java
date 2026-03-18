@@ -9,8 +9,7 @@ import com.miguel.assistencesystem.application.security.AuthenticationFacade;
 import com.miguel.assistencesystem.application.validation.client.ClientValidator;
 
 import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.miguel.assistencesystem.domain.exceptions.client.ClientNotFoundException;
 import com.miguel.assistencesystem.domain.exceptions.ConflictException;
