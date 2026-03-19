@@ -17,7 +17,7 @@ public class AuditLogDAO extends BaseDAO<AuditLog, Long> {
 				SELECT al FROM AuditLog al
 				WHERE al.entityType = :entityType
 				AND al.entityId = :entityId
-				ORDER BY al.occuredAt DESC
+				ORDER BY al.occurredAt DESC
 				""", AuditLog.class)
 				.setParameter("entityType", entityType)
 				.setParameter("entityId", entityId)
