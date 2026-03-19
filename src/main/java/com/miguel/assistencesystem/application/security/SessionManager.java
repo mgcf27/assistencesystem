@@ -5,9 +5,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import com.miguel.assistencesystem.infrastructure.persistence.AuthenticationTokenDAO;
 import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 import com.miguel.assistencesystem.infrastructure.security.session.AuthenticatedSessionView;
-import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationTokenDAO;
 
 @Component
 public class SessionManager {

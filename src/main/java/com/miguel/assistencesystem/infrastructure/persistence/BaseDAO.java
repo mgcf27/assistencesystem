@@ -55,8 +55,6 @@ public abstract class BaseDAO<T,ID>{
                 .getSingleResult();
     }
 
-
-
 	public void removeById(ID id) {
 	        T entity = em.find(entityClass, id);
 	        if (entity != null) {

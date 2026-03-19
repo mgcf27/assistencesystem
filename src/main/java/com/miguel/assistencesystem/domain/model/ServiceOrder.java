@@ -98,10 +98,10 @@ public class ServiceOrder {
                 allow(next, ServiceOrderStatus.IN_PROGRESS, ServiceOrderStatus.CANCELED);
                 break;
             case IN_PROGRESS:
-                allow(next, ServiceOrderStatus.FINISHED, ServiceOrderStatus.WAITING_PARTS, ServiceOrderStatus.CANCELED);
+                allow(next, ServiceOrderStatus.FINISHED, ServiceOrderStatus.WAITING_PARTS);
                 break;
             case WAITING_PARTS:
-                allow(next, ServiceOrderStatus.IN_PROGRESS, ServiceOrderStatus.CANCELED);
+                allow(next, ServiceOrderStatus.IN_PROGRESS, ServiceOrderStatus.FINISHED);
                 break;
             case FINISHED:
                 allow(next, ServiceOrderStatus.CLOSED);

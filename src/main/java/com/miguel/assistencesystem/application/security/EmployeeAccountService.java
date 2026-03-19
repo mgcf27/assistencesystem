@@ -3,15 +3,18 @@ package com.miguel.assistencesystem.application.security;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.miguel.assistencesystem.application.audit.AuditService;
 import com.miguel.assistencesystem.application.dto.command.EmployeeCreateDTO;
 import com.miguel.assistencesystem.application.dto.response.EmployeeResponseDTO;
 import com.miguel.assistencesystem.application.validation.employee.EmployeeValidator;
+import com.miguel.assistencesystem.domain.audit.AuditAction;
+import com.miguel.assistencesystem.domain.audit.EntityType;
 import com.miguel.assistencesystem.domain.exceptions.employee.InsufficientPermissionsException;
 import com.miguel.assistencesystem.domain.security.EmployeeAccount;
 import com.miguel.assistencesystem.domain.security.EmployeeRole;
+import com.miguel.assistencesystem.infrastructure.persistence.EmployeeAccountDAO;
 import com.miguel.assistencesystem.infrastructure.security.credential.PasswordHasher;
 import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
-import com.miguel.assistencesystem.infrastructure.security.persistence.EmployeeAccountDAO;
 
 @Service
 @Transactional
@@ -20,15 +23,18 @@ public class EmployeeAccountService {
 	private final EmployeeAccountDAO employeeDAO;
 	private final AuthenticationFacade authentication;
 	private final PasswordHasher passwordHasher;
+	private final AuditService auditService;
 	
 	public EmployeeAccountService(
 			EmployeeAccountDAO employeeDAO,
 			AuthenticationFacade authentication,
-			PasswordHasher passwordHasher
+			PasswordHasher passwordHasher,
+			AuditService auditService
 			) {
 		this.employeeDAO = employeeDAO;
 		this.authentication = authentication;
 		this.passwordHasher = passwordHasher;
+		this.auditService = auditService;
 	}
 
 	public EmployeeResponseDTO create(EmployeeCreateDTO employeeCreateDto) {
@@ -56,6 +62,11 @@ public class EmployeeAccountService {
 				);
 		
 		employeeDAO.persist(newEmployee);
+		
+		auditService.record(
+				AuditAction.EMPLOYEE_ACCOUNT_CREATED,
+				EntityType.EMPLOYEE_ACCOUNT,
+				newEmployee.getId());
 		
 		return EmployeeResponseDTO.fromEntity(newEmployee);
 	}

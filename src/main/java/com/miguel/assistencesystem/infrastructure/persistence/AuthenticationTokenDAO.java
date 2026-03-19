@@ -1,11 +1,12 @@
-package com.miguel.assistencesystem.infrastructure.security.session;
+package com.miguel.assistencesystem.infrastructure.persistence;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.miguel.assistencesystem.infrastructure.persistence.BaseDAO;
+import com.miguel.assistencesystem.infrastructure.security.session.AuthenticatedSessionView;
+import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationToken;
 
 @Repository
 public class AuthenticationTokenDAO extends BaseDAO<AuthenticationToken, Long> {

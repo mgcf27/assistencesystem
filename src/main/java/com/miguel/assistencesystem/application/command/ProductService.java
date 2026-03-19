@@ -3,9 +3,11 @@ package com.miguel.assistencesystem.application.command;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.miguel.assistencesystem.application.audit.AuditService;
 import com.miguel.assistencesystem.application.dto.command.ProductCreateDTO;
 import com.miguel.assistencesystem.application.dto.response.ProductResponseDTO;
-import com.miguel.assistencesystem.application.security.AuthenticationFacade;
+import com.miguel.assistencesystem.domain.audit.AuditAction;
+import com.miguel.assistencesystem.domain.audit.EntityType;
 import com.miguel.assistencesystem.domain.exceptions.ConflictException;
 import com.miguel.assistencesystem.domain.exceptions.client.ClientNotFoundException;
 import com.miguel.assistencesystem.domain.exceptions.product.InvalidProductDataException;
@@ -15,7 +17,6 @@ import com.miguel.assistencesystem.domain.model.Client;
 import com.miguel.assistencesystem.domain.model.Product;
 import com.miguel.assistencesystem.infrastructure.persistence.ClientJpaDAO;
 import com.miguel.assistencesystem.infrastructure.persistence.ProductJpaDAO;
-import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 
 @Service
 @Transactional
@@ -23,20 +24,18 @@ public class ProductService {
 	
     private final ProductJpaDAO productDAO;
     private final ClientJpaDAO clientDAO;
-    private final AuthenticationFacade authentication;
+    private final AuditService auditService;
     
     public ProductService(
     		ProductJpaDAO productDAO,
     		ClientJpaDAO clientDAO,
-    		AuthenticationFacade authentication) {
+    		AuditService auditService) {
     	this.clientDAO = clientDAO;
     	this.productDAO = productDAO;
-    	this.authentication = authentication;
+    	this.auditService = auditService;
     }
 
 	public ProductResponseDTO installProductIdentified(ProductCreateDTO dto) {
-		AuthenticatedIdentity identity = authentication.requireAuthenticated();
-		
 		Client client = clientDAO.findById(dto.getClientId())
                 .orElseThrow(() -> new ClientNotFoundException(dto.getClientId()));
         
@@ -55,13 +54,16 @@ public class ProductService {
         
         productDAO.persist(product);
         
+        auditService.record(
+        		AuditAction.PRODUCT_INSTALLED_IDENTIFIED,
+        		EntityType.PRODUCT,
+        		product.getId());
+        
         return ProductResponseDTO.fromEntity(product);
 	}
 		
 	public ProductResponseDTO installProductUnidentified(ProductCreateDTO dto) {
-		AuthenticatedIdentity identity = authentication.requireAuthenticated();
-		
-		if (dto.getModel() == null | dto.getModel().isBlank()) {
+		if (dto.getModel() == null || dto.getModel().isBlank()) {
 			throw new InvalidProductDataException("Product model cannot be empty");
 		}
 		
@@ -72,13 +74,16 @@ public class ProductService {
         
         productDAO.persist(product);
         
+        auditService.record(
+        		AuditAction.PRODUCT_INSTALLED_UNIDENTIFIED,
+        		EntityType.PRODUCT,
+        		product.getId());
+        
         return ProductResponseDTO.fromEntity(product);
 	    
 	}
 	
 	public ProductResponseDTO identifyProduct(Long productId, ProductCreateDTO dto) {
-		AuthenticatedIdentity identity = authentication.requireAuthenticated();
-
 		if (productDAO.existsBySerialNumber(dto.getSerialNumber())) {
             throw new ConflictException("Serial number already registered");
         }
@@ -97,6 +102,11 @@ public class ProductService {
                 dto.getSerialNumber(),
                 dto.getVoltage()
         );
+        
+        auditService.record(
+        		AuditAction.PRODUCT_IDENTIFIED,
+        		EntityType.PRODUCT,
+        		product.getId());
         
         return ProductResponseDTO.fromEntity(product);
 	}		
