@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.miguel.assistencesystem.infrastructure.config.SecuritySessionProperties;
+import com.miguel.assistencesystem.infrastructure.persistence.AuthenticationTokenDAO;
 import com.miguel.assistencesystem.infrastructure.security.session.AuthenticatedSessionView;
 import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationToken;
-import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationTokenDAO;
 
 @Service
 @Transactional

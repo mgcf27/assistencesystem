@@ -6,11 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.miguel.assistencesystem.application.dto.command.LoginRequestDTO;
 import com.miguel.assistencesystem.application.dto.response.LoginResponseDTO;
 import com.miguel.assistencesystem.domain.exceptions.authentication.InvalidCredentialsException;
+import com.miguel.assistencesystem.infrastructure.persistence.AuthenticationTokenDAO;
 import com.miguel.assistencesystem.infrastructure.security.credential.AuthenticationResult;
 import com.miguel.assistencesystem.infrastructure.security.credential.CredentialVerifier;
 import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationToken;
-import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationTokenDAO;
 import com.miguel.assistencesystem.infrastructure.security.session.TokenGenerator;
 
 @Service

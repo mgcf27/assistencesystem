@@ -9,7 +9,7 @@ import com.miguel.assistencesystem.application.validation.EmailValidator;
 import com.miguel.assistencesystem.application.validation.PhoneValidator;
 import com.miguel.assistencesystem.domain.exceptions.employee.DuplicateEmployeeException;
 import com.miguel.assistencesystem.domain.exceptions.employee.InvalidEmployeeDataException;
-import com.miguel.assistencesystem.infrastructure.security.persistence.EmployeeAccountDAO;
+import com.miguel.assistencesystem.infrastructure.persistence.EmployeeAccountDAO;
 
 public class EmployeeValidator {
 	private EmployeeValidator() {}

@@ -3,6 +3,7 @@ package com.miguel.assistencesystem.infrastructure.security.session;
 import org.springframework.stereotype.Component;
 
 import com.miguel.assistencesystem.infrastructure.config.SecuritySessionProperties;
+import com.miguel.assistencesystem.infrastructure.persistence.AuthenticationTokenDAO;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;

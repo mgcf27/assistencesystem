@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.miguel.assistencesystem.infrastructure.security.session.AuthenticationTokenDAO;
+import com.miguel.assistencesystem.infrastructure.persistence.AuthenticationTokenDAO;
 
 @Component
 public class AuthenticationTokenCleanupJob {

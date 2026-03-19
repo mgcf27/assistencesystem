@@ -9,9 +9,9 @@ import com.miguel.assistencesystem.application.validation.employee.EmployeeValid
 import com.miguel.assistencesystem.domain.exceptions.employee.InsufficientPermissionsException;
 import com.miguel.assistencesystem.domain.security.EmployeeAccount;
 import com.miguel.assistencesystem.domain.security.EmployeeRole;
+import com.miguel.assistencesystem.infrastructure.persistence.EmployeeAccountDAO;
 import com.miguel.assistencesystem.infrastructure.security.credential.PasswordHasher;
 import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
-import com.miguel.assistencesystem.infrastructure.security.persistence.EmployeeAccountDAO;
 
 @Service
 @Transactional

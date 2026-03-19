@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 import com.miguel.assistencesystem.domain.security.AuthenticationFailureReason;
 import com.miguel.assistencesystem.domain.security.EmployeeAccount;
+import com.miguel.assistencesystem.infrastructure.persistence.EmployeeAccountDAO;
 import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
-import com.miguel.assistencesystem.infrastructure.security.persistence.EmployeeAccountDAO;
 
 @Component
 public class CredentialVerifier {

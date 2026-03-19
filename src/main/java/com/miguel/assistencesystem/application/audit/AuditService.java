@@ -1,12 +1,11 @@
 package com.miguel.assistencesystem.application.audit;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.miguel.assistencesystem.application.security.AuthenticationFacade;
 import com.miguel.assistencesystem.domain.audit.AuditAction;
 import com.miguel.assistencesystem.domain.audit.AuditLog;
 import com.miguel.assistencesystem.domain.audit.EntityType;
+import com.miguel.assistencesystem.infrastructure.persistence.AuditLogDAO;
 import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 
 @Service

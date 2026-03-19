@@ -1,11 +1,10 @@
-package com.miguel.assistencesystem.infrastructure.security.persistence;
+package com.miguel.assistencesystem.infrastructure.persistence;
 
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
 import com.miguel.assistencesystem.domain.security.EmployeeAccount;
-import com.miguel.assistencesystem.infrastructure.persistence.BaseDAO;
 
 @Repository
 public class EmployeeAccountDAO extends BaseDAO<EmployeeAccount, Long> {

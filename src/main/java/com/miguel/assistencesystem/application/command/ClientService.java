@@ -2,36 +2,35 @@
 package com.miguel.assistencesystem.application.command;
 
 
+import com.miguel.assistencesystem.application.audit.AuditService;
 import com.miguel.assistencesystem.application.dto.command.ClientRegistrationDTO;
 import com.miguel.assistencesystem.application.dto.command.ClientUpdateDTO;
 import com.miguel.assistencesystem.application.dto.response.ClientResponseDTO;
-import com.miguel.assistencesystem.application.security.AuthenticationFacade;
 import com.miguel.assistencesystem.application.validation.client.ClientValidator;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.miguel.assistencesystem.domain.exceptions.client.ClientNotFoundException;
+import com.miguel.assistencesystem.domain.audit.AuditAction;
+import com.miguel.assistencesystem.domain.audit.EntityType;
 import com.miguel.assistencesystem.domain.exceptions.ConflictException;
 import com.miguel.assistencesystem.domain.model.Client;
 import com.miguel.assistencesystem.infrastructure.persistence.ClientJpaDAO;
-import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 
 @Service
 @Transactional
 public class ClientService{
 	
 	private final ClientJpaDAO clientDAO;
-	private final AuthenticationFacade authentication;
+	private final AuditService auditService;
 	
-	public ClientService(ClientJpaDAO clientDAO, AuthenticationFacade authentication) {
+	public ClientService(ClientJpaDAO clientDAO, AuditService auditService) {
 		this.clientDAO = clientDAO;
-		this.authentication = authentication;
+		this.auditService = auditService;
 	}
 	
 	public ClientResponseDTO registerClient(ClientRegistrationDTO dto) {
-		AuthenticatedIdentity identity = authentication.requireAuthenticated();
-		
 		ClientValidator.validateForRegistration(dto);
 		
 		ClientValidator.validateUniqueness(dto, clientDAO);
@@ -46,21 +45,18 @@ public class ClientService{
         
         clientDAO.persist(client);
         
+        auditService.record(AuditAction.CLIENT_REGISTERED, EntityType.CLIENT, client.getId());
+        
         return ClientResponseDTO.fromEntity(client);
 		
 	}
 	
 	public ClientResponseDTO updateClient(Long id, ClientUpdateDTO dto) {
-		AuthenticatedIdentity identity = authentication.requireAuthenticated();
-		
-		
 		ClientValidator.validateForUpdate(dto);
-		
-		// Find the entity
+
         Client client = clientDAO.findById(id)
                 .orElseThrow(() -> new ClientNotFoundException("Client not found with ID: " + id));
         
-        // Check phone uniqueness
         clientDAO.findByPhone(dto.getPhone())
                 .ifPresent(existingClient -> {
                     if (!existingClient.getId().equals(client.getId())) {
@@ -68,13 +64,14 @@ public class ClientService{
                     }
                 });
         
-        // Update the entity
         client.updateProfile(
                 dto.getName(),
                 dto.getPhone(),
                 dto.getAddress(),
                 dto.getEmail()
         );
+        
+        auditService.record(AuditAction.CLIENT_UPDATED, EntityType.CLIENT, client.getId());
         
         return ClientResponseDTO.fromEntity(client);
 			
