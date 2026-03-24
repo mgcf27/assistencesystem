@@ -12,6 +12,8 @@ import com.miguel.assistencesystem.infrastructure.persistence.ServiceOrderJpaDAO
 
 import java.util.function.Consumer;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,8 @@ public class ServiceOrderService {
 	private final AuditService auditService;
 	private final ServiceOrderJpaDAO serviceDAO; 
     private final ProductJpaDAO productDAO;
+    private static final String OPEN_SO_CONSTRAINT = "ux_one_open_so_per_product";
+    private static final String OPEN_SO_MESSAGE = "Product already has an open service order.";
     
     public ServiceOrderService(
     		AuditService auditService,
@@ -37,8 +41,7 @@ public class ServiceOrderService {
     	this.productDAO = productDAO;
     	this.serviceDAO = serviceDAO;
     }
-
-	
+    
 	public ServiceOrderResponseDTO openSO(ServiceOrderCreateDTO dto) {	
 		ServiceOrderValidator.validateForCreation(dto);
         
@@ -48,11 +51,19 @@ public class ServiceOrderService {
         Client client = product.getClient();
         
         if (serviceDAO.hasOpenServiceOrderForProduct(dto.getProductId())) {
-            throw new ServiceOrderAlreadyOpenException("Product already has an open service order. Wanna see it instead?");
+            throw new ServiceOrderAlreadyOpenException(OPEN_SO_MESSAGE);
         }
         
         ServiceOrder so = ServiceOrder.open(client, product, dto.getProblemDescription());
-        serviceDAO.persist(so);
+        
+        try {
+        	serviceDAO.persist(so);
+        }catch(DataIntegrityViolationException e) {
+        	if(isCausedBy(e,OPEN_SO_CONSTRAINT)) {
+        		throw new ServiceOrderAlreadyOpenException(OPEN_SO_MESSAGE);
+        	}
+        	throw e;
+        }
         
         auditService.record(AuditAction.SERVICE_ORDER_OPENED, EntityType.SERVICE_ORDER, so.getId());
         
@@ -96,5 +107,16 @@ public class ServiceOrderService {
 		
 		return ServiceOrderResponseDTO.fromEntity(so);
 	
+	}
+
+	private static boolean isCausedBy(Throwable t, String constraintName) {
+		Throwable current = t;
+		while(current != null) {
+			if(current instanceof ConstraintViolationException cve) {
+				return constraintName.equals(cve.getConstraintName());
+			}
+			current = current.getCause();
+		}
+		return false;
 	}
 }

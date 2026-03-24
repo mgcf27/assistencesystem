@@ -78,7 +78,7 @@ public class ApiExceptionHandler {
 	}
 	
 	//=====================================================================================
-	
+	 
 	@ExceptionHandler(InvalidCredentialsException.class)
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public ApiErrorResponse handleInvalidCredentials(RuntimeException ex) {
@@ -90,7 +90,7 @@ public class ApiExceptionHandler {
 	@ExceptionHandler(InsufficientPermissionsException.class)
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	public ApiErrorResponse handleInsufficientPermissions(RuntimeException ex) {
-		return ApiErrorResponse.of("INSUFFICIENT_PERMISSON", ex.getMessage());
+		return ApiErrorResponse.of("INSUFFICIENT_PERMISSiON", ex.getMessage());
 	}
 	
 	//=====================================================================================

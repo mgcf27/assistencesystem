@@ -130,16 +130,20 @@ public class ServiceOrderJpaDAO extends BaseDAO<ServiceOrder, Long>{
 	
 	//====================== COMMAND SUPPORT QUERIES ======================
 	public boolean hasOpenServiceOrderForProduct(long productId) {
-	    Long count = em.createQuery(
-	            "SELECT COUNT(s) FROM ServiceOrder s " +
-	            "WHERE s.product.prodId = :productId " +
-	            "AND (s.status = :open OR s.status = :inProgress)",
-	            Long.class)
-	            .setParameter("productId", productId)
-	            .setParameter("open", ServiceOrderStatus.OPEN)
-	            .setParameter("inProgress", ServiceOrderStatus.IN_PROGRESS)
-	            .getSingleResult();
-	    return count > 0;
+		return !em.createQuery(
+		        "SELECT s FROM ServiceOrder s " +
+		        "WHERE s.product.prodId = :productId " +
+		        "AND (s.status = :open OR s.status = :inProgress OR s.status = :waitingParts)",
+		        ServiceOrder.class
+		    )
+		    .setParameter("productId", productId)
+		    .setParameter("open", ServiceOrderStatus.OPEN)
+		    .setParameter("inProgress", ServiceOrderStatus.IN_PROGRESS)
+		    .setParameter("waitingParts", ServiceOrderStatus.WAITING_PARTS)
+		    .setMaxResults(1)
+		    .getResultList()
+		    .isEmpty();
+	    
 	}
 	
 

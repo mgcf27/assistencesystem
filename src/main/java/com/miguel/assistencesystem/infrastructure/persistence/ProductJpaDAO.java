@@ -25,17 +25,21 @@ public class ProductJpaDAO extends BaseDAO<Product, Long>{
 			Long id,
 			PageRequest pageRequest){ 
 		return  em.createQuery(
-				"SELECT p FROM Product p WHERE p.client.ClientID = :clientId", Product.class)
+				"""
+				SELECT p FROM Product p
+				WHERE p.client.clientId = :clientId
+				ORDER BY p.prodId
+				""",Product.class)			
 				.setParameter("clientId", id)
 				.setFirstResult(pageRequest.offset())
 				.setMaxResults(pageRequest.pageSize())
 				.getResultList();				
 	}
 	
-	public ClientReferenceDTO findOwnerReferenceByProductId(Long productId) {
+	public ClientReferenceDTO findOwnerReferenceByProductId(Long prodId) {
 	    return em.createQuery(
 	        """
-	        SELECT new com.miguel.assistencesystem.view.product.dto.ClientReferenceDTO(
+	        SELECT new com.miguel.assistencesystem.application.dto.view.ClientReferenceDTO(
 	            c.clientId,
 	            c.name
 	        )
@@ -45,7 +49,7 @@ public class ProductJpaDAO extends BaseDAO<Product, Long>{
 	        """,
 	        ClientReferenceDTO.class
 	    )
-	    .setParameter("productId", productId)
+	    .setParameter("productId", prodId)
 	    .getSingleResult();
 	}
 
