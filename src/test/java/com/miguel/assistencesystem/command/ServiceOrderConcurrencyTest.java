@@ -24,6 +24,7 @@ import com.miguel.assistencesystem.application.dto.command.ServiceOrderCreateDTO
 import com.miguel.assistencesystem.domain.model.Client;
 import com.miguel.assistencesystem.domain.model.Product;
 import com.miguel.assistencesystem.infrastructure.persistence.ServiceOrderJpaDAO;
+import com.miguel.assistencesystem.infrastructure.security.context.AuthenticationContext;
 import com.miguel.assistencesystem.support.TestFactory;
 
 import jakarta.persistence.EntityManager;
@@ -33,10 +34,10 @@ import jakarta.persistence.EntityManager;
 class ServiceOrderConcurrencyTest {
 
     @Autowired
-    private ServiceOrderService serviceOrderService;
-
-    @Autowired
     private ServiceOrderJpaDAO serviceOrderDAO;
+    
+    @Autowired
+    private ServiceOrderService serviceOrderService;
 
     @Autowired
     private EntityManager entityManager;
@@ -44,7 +45,6 @@ class ServiceOrderConcurrencyTest {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
-    @SuppressWarnings("unused")
 	private void runInTransaction(Runnable action) {
         new TransactionTemplate(transactionManager).execute(status -> {
             action.run();
@@ -74,13 +74,15 @@ class ServiceOrderConcurrencyTest {
         Runnable task = () -> {
             try {
                 startLatch.await(); // ensure true concurrency
-                serviceOrderService.openSO(
-                    new ServiceOrderCreateDTO(product.getId(), "Concurrent problem")
-                );
+                AuthenticationContext.set(TestFactory.randomAuthIdentity());
+				serviceOrderService.openSO(
+                	    new ServiceOrderCreateDTO(product.getId(), "problem description")
+                	);
             } catch (Throwable t) {
                 errors.add(t);
             } finally {
                 doneLatch.countDown();
+                AuthenticationContext.clear();
             }
         };
 

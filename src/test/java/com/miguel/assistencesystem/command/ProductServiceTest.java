@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +19,11 @@ import com.miguel.assistencesystem.domain.exceptions.product.InvalidProductDataE
 import com.miguel.assistencesystem.domain.exceptions.product.InvalidProductStateException;
 import com.miguel.assistencesystem.domain.model.Client;
 import com.miguel.assistencesystem.domain.model.Product;
+import com.miguel.assistencesystem.domain.security.EmployeeRole;
 import com.miguel.assistencesystem.infrastructure.persistence.ClientJpaDAO;
 import com.miguel.assistencesystem.infrastructure.persistence.ProductJpaDAO;
+import com.miguel.assistencesystem.infrastructure.security.context.AuthenticationContext;
+import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 import com.miguel.assistencesystem.support.TestFactory;
 
 import jakarta.persistence.EntityManager;
@@ -38,6 +43,22 @@ public class ProductServiceTest {
         entityManager.flush();
         entityManager.clear();
     }
+	
+	@BeforeEach
+	void setupAuth() {
+	    AuthenticationContext.set(
+	        new AuthenticatedIdentity(
+	        		1L,
+	        		"test@system.com",
+	        		EmployeeRole.ADMIN,
+	        		"test-token")
+	    );
+	}
+
+	@AfterEach
+	void clearAuth() {
+	    AuthenticationContext.clear();
+	}
 	
 	
 	@Test

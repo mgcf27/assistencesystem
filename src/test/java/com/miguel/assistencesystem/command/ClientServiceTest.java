@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +16,10 @@ import com.miguel.assistencesystem.application.command.ClientService;
 import com.miguel.assistencesystem.application.dto.command.ClientRegistrationDTO;
 import com.miguel.assistencesystem.domain.exceptions.ConflictException;
 import com.miguel.assistencesystem.domain.exceptions.client.InvalidClientDataException;
+import com.miguel.assistencesystem.domain.security.EmployeeRole;
 import com.miguel.assistencesystem.infrastructure.persistence.ClientJpaDAO;
+import com.miguel.assistencesystem.infrastructure.security.context.AuthenticationContext;
+import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 import com.miguel.assistencesystem.support.TestFactory;
 
 import jakarta.persistence.EntityManager;
@@ -35,6 +40,22 @@ public class ClientServiceTest {
         entityManager.flush();
         entityManager.clear();
     }
+	
+	@BeforeEach
+	void setupAuth() {
+	    AuthenticationContext.set(
+	        new AuthenticatedIdentity(
+	        		1L,
+	        		"test@system.com",
+	        		EmployeeRole.ADMIN,
+	        		"test-token")
+	    );
+	}
+
+	@AfterEach
+	void clearAuth() {
+	    AuthenticationContext.clear();
+	}
 	
 	// Observation: The same logic below can be applied to updating
 	

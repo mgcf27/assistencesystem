@@ -3,6 +3,8 @@ package com.miguel.assistencesystem.command;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +20,10 @@ import com.miguel.assistencesystem.domain.exceptions.serviceorder.ServiceOrderAl
 import com.miguel.assistencesystem.domain.model.Client;
 import com.miguel.assistencesystem.domain.model.Product;
 import com.miguel.assistencesystem.domain.model.ServiceOrder;
+import com.miguel.assistencesystem.domain.security.EmployeeRole;
 import com.miguel.assistencesystem.infrastructure.persistence.ServiceOrderJpaDAO;
+import com.miguel.assistencesystem.infrastructure.security.context.AuthenticationContext;
+import com.miguel.assistencesystem.infrastructure.security.identity.AuthenticatedIdentity;
 import com.miguel.assistencesystem.support.TestFactory;
 
 import jakarta.persistence.EntityManager;
@@ -39,6 +44,22 @@ public class ServiceOrderServiceTest {
         entityManager.flush();  // Force sync with DB
         entityManager.clear();  // Clear Hibernate cache
     }
+    
+    @BeforeEach
+	void setupAuth() {
+	    AuthenticationContext.set(
+	        new AuthenticatedIdentity(
+	        		1L,
+	        		"test@system.com",
+	        		EmployeeRole.ADMIN,
+	        		"test-token")
+	    );
+	}
+
+	@AfterEach
+	void clearAuth() {
+	    AuthenticationContext.clear();
+	}
 	
 	
     
@@ -109,6 +130,8 @@ public class ServiceOrderServiceTest {
 	    flushAndClear();
 
 	    ServiceOrder so = TestFactory.serviceOrder(client, product, "Problem description");
+	    
+	    entityManager.persist(so);
 	    
 	    flushAndClear();
 		
