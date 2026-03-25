@@ -3,10 +3,13 @@ package com.miguel.assistencesystem.infrastructure.persistence;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import com.miguel.assistencesystem.domain.audit.AuditLog;
 import com.miguel.assistencesystem.domain.audit.EntityType;
 import com.miguel.assistencesystem.domain.valueobjects.PageRequest;
 
+@Repository
 public class AuditLogDAO extends BaseDAO<AuditLog, Long> {
 	public AuditLogDAO() {
 		super(AuditLog.class);
