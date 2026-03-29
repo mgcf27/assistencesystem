@@ -26,3 +26,4 @@ jobs:
 
       - name: Run tests
         run: ./mvnw clean test
+        env: SPRING_PROFILES_ACTIVE: test
