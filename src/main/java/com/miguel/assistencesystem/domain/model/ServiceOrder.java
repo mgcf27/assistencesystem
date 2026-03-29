@@ -10,8 +10,7 @@ import com.miguel.assistencesystem.domain.valueobjects.ServiceOrderProtocolGener
 
 
 @Entity
-@Table(name = "service_orders",
-uniqueConstraints = @UniqueConstraint(name = "ux_one_open_so_per_product", columnNames = "prod_id"))
+@Table
 public class ServiceOrder {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
