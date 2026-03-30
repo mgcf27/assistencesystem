@@ -8,13 +8,15 @@ import com.miguel.assistencesystem.application.dto.command.ClientUpdateDTO;
 import com.miguel.assistencesystem.application.dto.response.ClientResponseDTO;
 import com.miguel.assistencesystem.application.validation.client.ClientValidator;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.miguel.assistencesystem.domain.exceptions.client.ClientNotFoundException;
+import com.miguel.assistencesystem.domain.exceptions.client.InvalidClientDataException;
 import com.miguel.assistencesystem.domain.audit.AuditAction;
 import com.miguel.assistencesystem.domain.audit.EntityType;
-import com.miguel.assistencesystem.domain.exceptions.ConflictException;
 import com.miguel.assistencesystem.domain.model.Client;
 import com.miguel.assistencesystem.infrastructure.persistence.ClientJpaDAO;
 
@@ -60,7 +62,7 @@ public class ClientService{
         clientDAO.findByPhone(dto.getPhone())
                 .ifPresent(existingClient -> {
                     if (!existingClient.getId().equals(client.getId())) {
-                        throw new ConflictException("Phone number already registered. Wanna see the client instead?");
+                        throw new InvalidClientDataException(List.of("Phone number already registered. Wanna see the client instead?"));
                     }
                 });
         

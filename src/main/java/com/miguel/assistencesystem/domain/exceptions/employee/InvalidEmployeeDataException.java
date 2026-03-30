@@ -2,6 +2,7 @@ package com.miguel.assistencesystem.domain.exceptions.employee;
 
 import java.util.List;
 
+import com.miguel.assistencesystem.domain.enums.DomainErrorCode;
 import com.miguel.assistencesystem.domain.exceptions.ValidationException;
 
 @SuppressWarnings("serial")
@@ -10,7 +11,9 @@ public class InvalidEmployeeDataException extends ValidationException {
 	
 	
 	public InvalidEmployeeDataException(List<String> errors) {
-		 super("Invalid employee data: " + String.join(", ", errors));
+		 super(
+				 DomainErrorCode.INVALID_EMPLOYEE_DATA,
+				 "Invalid employee data: " + String.join(", ", errors));
 	     this.errors = errors;
 	}
 

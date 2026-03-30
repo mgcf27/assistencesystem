@@ -8,7 +8,6 @@ import com.miguel.assistencesystem.application.dto.command.ProductCreateDTO;
 import com.miguel.assistencesystem.application.dto.response.ProductResponseDTO;
 import com.miguel.assistencesystem.domain.audit.AuditAction;
 import com.miguel.assistencesystem.domain.audit.EntityType;
-import com.miguel.assistencesystem.domain.exceptions.ConflictException;
 import com.miguel.assistencesystem.domain.exceptions.client.ClientNotFoundException;
 import com.miguel.assistencesystem.domain.exceptions.product.InvalidProductDataException;
 import com.miguel.assistencesystem.domain.exceptions.product.InvalidProductStateException;
@@ -40,7 +39,7 @@ public class ProductService {
                 .orElseThrow(() -> new ClientNotFoundException(dto.getClientId()));
         
         if (productDAO.existsBySerialNumber(dto.getSerialNumber())) {
-            throw new ConflictException("Product already exists. Wanna see it instead?");
+            throw new InvalidProductDataException("Product already exists. Wanna see it instead?");
         }
         
         Product product = Product.registerIdentified(
@@ -85,7 +84,7 @@ public class ProductService {
 	
 	public ProductResponseDTO identifyProduct(Long productId, ProductCreateDTO dto) {
 		if (productDAO.existsBySerialNumber(dto.getSerialNumber())) {
-            throw new ConflictException("Serial number already registered");
+            throw new InvalidProductDataException("Serial number already registered");
         }
 
         Product product = productDAO.findById(productId)

@@ -1,5 +1,6 @@
 package com.miguel.assistencesystem.domain.exceptions.client;
 
+import com.miguel.assistencesystem.domain.enums.DomainErrorCode;
 import com.miguel.assistencesystem.domain.exceptions.ValidationException;
 import java.util.List;
 
@@ -9,7 +10,9 @@ public class InvalidClientDataException extends ValidationException {
     private final List<String> errors;
     
     public InvalidClientDataException(List<String> errors) {
-        super("Invalid client data: " + String.join(", ", errors));
+        super(
+        		DomainErrorCode.INVALID_CLIENT_DATA,
+        		"Invalid client data: " + String.join(", ", errors));
         this.errors = errors;
     }
     

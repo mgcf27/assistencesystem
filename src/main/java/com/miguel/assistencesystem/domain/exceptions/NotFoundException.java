@@ -1,13 +1,15 @@
 package com.miguel.assistencesystem.domain.exceptions;
 
+import com.miguel.assistencesystem.domain.enums.DomainErrorCode;
+
 @SuppressWarnings("serial")
-public class NotFoundException extends BusinessException {
+public abstract class NotFoundException extends BusinessException {
     
-    public NotFoundException(String message) {
-        super(message);
+    public NotFoundException(DomainErrorCode code,String message) {
+        super(code, message);
     }
     
-    public NotFoundException(String message, Throwable cause) {
-        super(message, cause);
+    public NotFoundException(DomainErrorCode code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 }

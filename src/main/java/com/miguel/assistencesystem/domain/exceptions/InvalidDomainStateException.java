@@ -1,13 +1,15 @@
 package com.miguel.assistencesystem.domain.exceptions;
 
+import com.miguel.assistencesystem.domain.enums.DomainErrorCode;
+
 @SuppressWarnings("serial")
-public abstract class InvalidDomainStateException extends RuntimeException {
+public abstract class InvalidDomainStateException extends BusinessException {
 	
-	public InvalidDomainStateException(String message) {
-		super(message);
+	public InvalidDomainStateException(DomainErrorCode code,String message) {
+		super(code, message);
 	}
 
-	public InvalidDomainStateException(String message, Throwable cause) {
-		super(message, cause);
+	public InvalidDomainStateException(DomainErrorCode code, String message, Throwable cause) {
+		super(code, message, cause);
 	}
 }
