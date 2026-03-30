@@ -90,7 +90,7 @@ public class ProductServiceTest {
 		
 		flushAndClear();
 		
-		assertThrows(ConflictException.class,() -> {
+		assertThrows(InvalidProductDataException.class,() -> {
 			productService.installProductIdentified(product2);
 		});
 		
