@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.miguel.assistencesystem.application.command.ProductService;
 import com.miguel.assistencesystem.application.dto.command.ProductCreateDTO;
-import com.miguel.assistencesystem.domain.exceptions.ConflictException;
 import com.miguel.assistencesystem.domain.exceptions.product.InvalidProductDataException;
 import com.miguel.assistencesystem.domain.exceptions.product.InvalidProductStateException;
 import com.miguel.assistencesystem.domain.model.Client;
