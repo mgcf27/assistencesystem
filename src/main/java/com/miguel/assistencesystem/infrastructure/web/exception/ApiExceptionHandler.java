@@ -1,12 +1,16 @@
 package com.miguel.assistencesystem.infrastructure.web.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.miguel.assistencesystem.application.dto.response.ApiErrorResponse;
-import com.miguel.assistencesystem.domain.enums.DomainErrorCode;
 import com.miguel.assistencesystem.domain.exceptions.ConflictException;
 import com.miguel.assistencesystem.domain.exceptions.InvalidDomainStateException;
 import com.miguel.assistencesystem.domain.exceptions.NotFoundException;
@@ -14,6 +18,8 @@ import com.miguel.assistencesystem.domain.exceptions.ValidationException;
 import com.miguel.assistencesystem.domain.exceptions.authentication.InvalidCredentialsException;
 import com.miguel.assistencesystem.domain.exceptions.authentication.UnauthenticatedException;
 import com.miguel.assistencesystem.domain.exceptions.employee.InsufficientPermissionsException;
+import com.miguel.assistencesystem.infrastructure.web.error.InfrastructureErrorCode;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -25,7 +31,7 @@ public class ApiExceptionHandler {
 	    return ApiErrorResponse.of(
 	    		HttpStatus.CONFLICT.value(),
 	    		HttpStatus.CONFLICT.getReasonPhrase(),
-	    		ex.getErrorCode(),
+	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
 	    		request.getRequestURI());
 	}
@@ -34,11 +40,11 @@ public class ApiExceptionHandler {
 	
 	@ExceptionHandler(NotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ApiErrorResponse handleBadRequest(NotFoundException ex, HttpServletRequest request) {
+	public ApiErrorResponse handleNotFound(NotFoundException ex, HttpServletRequest request) {
 		return ApiErrorResponse.of(
 	    		HttpStatus.NOT_FOUND.value(),
 	    		HttpStatus.NOT_FOUND.getReasonPhrase(),
-	    		ex.getErrorCode(),
+	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
 	    		request.getRequestURI());
 	}
@@ -47,11 +53,11 @@ public class ApiExceptionHandler {
 	
 	@ExceptionHandler(ValidationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ApiErrorResponse handleUnprocessable(ValidationException ex, HttpServletRequest request) {
+	public ApiErrorResponse handleValidation(ValidationException ex, HttpServletRequest request) {
 		return ApiErrorResponse.of(
 	    		HttpStatus.BAD_REQUEST.value(),
 	    		HttpStatus.BAD_REQUEST.getReasonPhrase(),
-	    		ex.getErrorCode(),
+	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
 	    		request.getRequestURI());
 	}
@@ -60,11 +66,11 @@ public class ApiExceptionHandler {
 	
 	@ExceptionHandler(InvalidDomainStateException.class)
 	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-	public ApiErrorResponse handleUnexpected(InvalidDomainStateException ex, HttpServletRequest request) {
+	public ApiErrorResponse handleInvalidDomainState(InvalidDomainStateException ex, HttpServletRequest request) {
 		return ApiErrorResponse.of(
 	    		HttpStatus.UNPROCESSABLE_ENTITY.value(),
 	    		HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
-	    		ex.getErrorCode(),
+	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
 	    		request.getRequestURI());
 	}
@@ -77,7 +83,7 @@ public class ApiExceptionHandler {
 		return ApiErrorResponse.of(
 	    		HttpStatus.UNAUTHORIZED.value(),
 	    		HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-	    		ex.getErrorCode(),
+	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
 	    		request.getRequestURI());
 	}
@@ -90,7 +96,7 @@ public class ApiExceptionHandler {
 		return ApiErrorResponse.of(
 	    		HttpStatus.FORBIDDEN.value(),
 	    		HttpStatus.FORBIDDEN.getReasonPhrase(),
-	    		ex.getErrorCode(),
+	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
 	    		request.getRequestURI());
 	}
@@ -103,28 +109,90 @@ public class ApiExceptionHandler {
 		return ApiErrorResponse.of(
 	    		HttpStatus.UNAUTHORIZED.value(),
 	    		HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-	    		ex.getErrorCode(),
+	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
 	    		request.getRequestURI());
 	}
+	//=====================================================================================
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ApiErrorResponse handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
+		return ApiErrorResponse.of(
+				HttpStatus.BAD_REQUEST.value(),
+				HttpStatus.BAD_REQUEST.getReasonPhrase(),
+				InfrastructureErrorCode.MALFORMED_REQUEST,
+		        "Request body is missing or malformed.",
+		        request.getRequestURI()
+				);
+	}
+	//=====================================================================================
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ApiErrorResponse handleMethodArgumentTypeMismatch(
+	    MethodArgumentTypeMismatchException ex,
+	    HttpServletRequest request) {
 
-	
-	
+	    String paramName = ex.getName();
+
+	    return ApiErrorResponse.of(
+	        HttpStatus.BAD_REQUEST.value(),
+	        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+	        InfrastructureErrorCode.INVALID_PARAMETER,
+	        "Invalid value for parameter '" + paramName + "'.",
+	        request.getRequestURI()
+	    );
+	}
+	//=====================================================================================
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+	public ApiErrorResponse handleMethodNotSupported(
+	    HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+	    return ApiErrorResponse.of(
+	        HttpStatus.METHOD_NOT_ALLOWED.value(),
+	        HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),
+	        InfrastructureErrorCode.METHOD_NOT_ALLOWED,
+	        "HTTP method not supported for this endpoint",
+	        request.getRequestURI());
+	}
+	//=====================================================================================
+	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+	@ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+	public ApiErrorResponse handleMediaTypeNotSupported(
+	    HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+	    return ApiErrorResponse.of(
+	        HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
+	        HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase(),
+	        InfrastructureErrorCode.UNSUPPORTED_MEDIA_TYPE,
+	        "Unsupported media type. Please check the Content-Type header",
+	        request.getRequestURI());
+	}
+	//=====================================================================================
+	@ExceptionHandler(NoResourceFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ApiErrorResponse handleNoResourceFound(
+	    NoResourceFoundException ex, HttpServletRequest request) {
+	    return ApiErrorResponse.of(
+	        HttpStatus.NOT_FOUND.value(),
+	        HttpStatus.NOT_FOUND.getReasonPhrase(),
+	        InfrastructureErrorCode.ROUTE_NOT_FOUND,
+	        "The requested endpoint does not exist.",
+	        request.getRequestURI());
+	}
+
+	//=====================================================================================
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ApiErrorResponse handleGeneric(HttpServletRequest request, Exception ex) {
+	public ApiErrorResponse handleGeneric(Exception ex, HttpServletRequest request) {
 	    
 	    
 	    return ApiErrorResponse.of(
 	        HttpStatus.INTERNAL_SERVER_ERROR.value(),
 	        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-	        DomainErrorCode.INTERNAL_ERROR,
+	        InfrastructureErrorCode.INTERNAL_ERROR,
 	        "An unexpected internal error occurred. Please try again later.",
 	        request.getRequestURI()
 	    );
 	}
-	
-
 }
 
 
