@@ -13,6 +13,8 @@ import com.miguel.assistencesystem.application.command.ProductService;
 import com.miguel.assistencesystem.application.dto.command.ProductCreateDTO;
 import com.miguel.assistencesystem.application.dto.response.ProductResponseDTO;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/products")
 public class ProductCommandController {
@@ -26,21 +28,21 @@ public class ProductCommandController {
 	@PostMapping("/identified")
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponseDTO installIdentified(
-            @RequestBody ProductCreateDTO dto) {
+            @Valid @RequestBody ProductCreateDTO dto) {
         return productService.installProductIdentified(dto);
     }
 
     @PostMapping("/unidentified")
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponseDTO installUnidentified(
-            @RequestBody ProductCreateDTO dto) {
+            @Valid @RequestBody ProductCreateDTO dto) {
         return productService.installProductUnidentified(dto);
     }
 
     @PatchMapping("/{id}/identify")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void identifyProduct(@PathVariable Long id,
-                                @RequestBody ProductCreateDTO dto) {
+                                @Valid @RequestBody ProductCreateDTO dto) {
         productService.identifyProduct(id, dto);
     }
 

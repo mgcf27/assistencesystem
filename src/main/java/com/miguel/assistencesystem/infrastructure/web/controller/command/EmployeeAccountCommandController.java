@@ -11,6 +11,8 @@ import com.miguel.assistencesystem.application.dto.command.EmployeeCreateDTO;
 import com.miguel.assistencesystem.application.dto.response.EmployeeResponseDTO;
 import com.miguel.assistencesystem.application.security.EmployeeAccountService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/employees")
 
@@ -24,7 +26,7 @@ public class EmployeeAccountCommandController {
 	@PostMapping 
 	@ResponseStatus(HttpStatus.CREATED)
 	public  EmployeeResponseDTO createEmployee(
-			@RequestBody EmployeeCreateDTO employeeCreateDto) {
+			@Valid @RequestBody EmployeeCreateDTO employeeCreateDto) {
 		return employeeService.create(employeeCreateDto);
 	}
 	

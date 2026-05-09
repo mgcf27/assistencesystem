@@ -14,6 +14,8 @@ import com.miguel.assistencesystem.application.dto.command.ClientRegistrationDTO
 import com.miguel.assistencesystem.application.dto.command.ClientUpdateDTO;
 import com.miguel.assistencesystem.application.dto.response.ClientResponseDTO;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/clients")
 public class ClientCommandController {
@@ -26,14 +28,14 @@ public class ClientCommandController {
 
 	@PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClientResponseDTO registerClient(@RequestBody ClientRegistrationDTO dto) {
+    public ClientResponseDTO registerClient(@Valid @RequestBody ClientRegistrationDTO dto) {
         return clientService.registerClient(dto);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateProfile(@PathVariable Long id,
-                              @RequestBody ClientUpdateDTO dto) {
+    						@Valid @RequestBody ClientUpdateDTO dto) {
         clientService.updateClient(id, dto);
     }
 }

@@ -1,11 +1,31 @@
 package com.miguel.assistencesystem.application.dto.command;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class ProductCreateDTO {
-    private Long clientId;              
-    private String model;               
-    private String commercialModel;     
-    private String manufacturerCode;    
-    private String serialNumber;        
+	@NotNull
+    private Long clientId;
+	@NotNull
+	@NotBlank
+	@Size(max=100)
+    private String model;
+	@NotNull
+	@NotBlank
+	@Size(max=100)
+    private String commercialModel;
+	@NotNull
+	@NotBlank
+	@Size(max=50)
+    private String manufacturerCode;
+	@NotNull
+	@NotBlank
+	@Size(max=50)
+    private String serialNumber; 
+	@NotNull
+	@NotBlank
+	@Size(max=20)
     private String voltage;             
     
    

@@ -13,6 +13,8 @@ import com.miguel.assistencesystem.application.command.ServiceOrderService;
 import com.miguel.assistencesystem.application.dto.command.ServiceOrderCreateDTO;
 import com.miguel.assistencesystem.application.dto.response.ServiceOrderResponseDTO;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/service-orders")
 public class ServiceOrderCommandController {
@@ -27,7 +29,7 @@ public class ServiceOrderCommandController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ServiceOrderResponseDTO open(@RequestBody ServiceOrderCreateDTO dto) {
+    public ServiceOrderResponseDTO open(@Valid @RequestBody ServiceOrderCreateDTO dto) {
         return serviceOrderService.openSO(dto);
     }
 

@@ -3,6 +3,9 @@ package com.miguel.assistencesystem.infrastructure.web.controller.command;
 import com.miguel.assistencesystem.application.dto.command.LoginRequestDTO;
 import com.miguel.assistencesystem.application.dto.response.LoginResponseDTO;
 import com.miguel.assistencesystem.application.security.AuthenticationService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +24,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public LoginResponseDTO login(
-            @RequestBody LoginRequestDTO request
+            @Valid @RequestBody LoginRequestDTO request
     ) {
 
         return authenticationService.login(request);

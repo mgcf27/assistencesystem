@@ -1,14 +1,38 @@
 package com.miguel.assistencesystem.application.dto.command;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import com.miguel.assistencesystem.domain.security.EmployeeRole;
 
 public class EmployeeCreateDTO {
+	@NotNull
+	@NotBlank
+	@Email(regexp = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+	@Size(max=100)
 	private String email;
+	@NotNull
+	@NotBlank
 	private String password;
+	@NotNull
+	@NotBlank
+	@Size(max=225)
 	private String name;
+	@NotNull
+	@NotBlank
+	@Size(max=14)
 	private String cpf;
+	@NotNull
+	@NotBlank
+	@Size(max=20)
 	private String phone;
+	@NotNull
+	@NotBlank
+	@Size(max=200)
 	private String address;
+	@NotNull
 	private EmployeeRole role;
 	
 	public EmployeeCreateDTO() {}

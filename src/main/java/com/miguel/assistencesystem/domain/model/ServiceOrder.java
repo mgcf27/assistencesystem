@@ -32,7 +32,7 @@ public class ServiceOrder {
     	    length = 30)
     private String protocolNumber;
 	
-	@Column(name = "problem_description")
+	@Column(name = "problem_description", length = 300)
 	private String problemDescription;
 
 	@Column(name = "opened_at", nullable = false)

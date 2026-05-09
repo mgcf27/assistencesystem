@@ -1,7 +1,15 @@
 package com.miguel.assistencesystem.application.dto.command;
 
-public class ServiceOrderCreateDTO {             
-    private Long productId;             
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public class ServiceOrderCreateDTO {
+	@NotNull
+    private Long productId;
+	@NotNull
+	@NotBlank
+	@Size(max=300)
     private String problemDescription; 
     
     public Long getProductId() { return productId; }
