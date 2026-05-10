@@ -1,9 +1,13 @@
 package com.miguel.assistencesystem.infrastructure.web.exception;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +37,7 @@ public class ApiExceptionHandler {
 	    		HttpStatus.CONFLICT.getReasonPhrase(),
 	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
+	    		null,
 	    		request.getRequestURI());
 	}
 	
@@ -46,6 +51,7 @@ public class ApiExceptionHandler {
 	    		HttpStatus.NOT_FOUND.getReasonPhrase(),
 	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
+	    		null,
 	    		request.getRequestURI());
 	}
 	
@@ -59,6 +65,7 @@ public class ApiExceptionHandler {
 	    		HttpStatus.BAD_REQUEST.getReasonPhrase(),
 	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
+	    		null,
 	    		request.getRequestURI());
 	}
 	
@@ -72,6 +79,7 @@ public class ApiExceptionHandler {
 	    		HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
 	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
+	    		null,
 	    		request.getRequestURI());
 	}
 	
@@ -85,6 +93,7 @@ public class ApiExceptionHandler {
 	    		HttpStatus.UNAUTHORIZED.getReasonPhrase(),
 	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
+	    		null,
 	    		request.getRequestURI());
 	}
 	
@@ -98,6 +107,7 @@ public class ApiExceptionHandler {
 	    		HttpStatus.FORBIDDEN.getReasonPhrase(),
 	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
+	    		null,
 	    		request.getRequestURI());
 	}
 	
@@ -111,6 +121,7 @@ public class ApiExceptionHandler {
 	    		HttpStatus.UNAUTHORIZED.getReasonPhrase(),
 	    		ex.getErrorCode().name(),
 	    		ex.getMessage(),
+	    		null,
 	    		request.getRequestURI());
 	}
 	//=====================================================================================
@@ -122,6 +133,7 @@ public class ApiExceptionHandler {
 				HttpStatus.BAD_REQUEST.getReasonPhrase(),
 				InfrastructureErrorCode.MALFORMED_REQUEST,
 		        "Request body is missing or malformed.",
+		        null,
 		        request.getRequestURI()
 				);
 	}
@@ -139,6 +151,7 @@ public class ApiExceptionHandler {
 	        HttpStatus.BAD_REQUEST.getReasonPhrase(),
 	        InfrastructureErrorCode.INVALID_PARAMETER,
 	        "Invalid value for parameter '" + paramName + "'.",
+	        null,
 	        request.getRequestURI()
 	    );
 	}
@@ -152,6 +165,7 @@ public class ApiExceptionHandler {
 	        HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),
 	        InfrastructureErrorCode.METHOD_NOT_ALLOWED,
 	        "HTTP method not supported for this endpoint",
+	        null,
 	        request.getRequestURI());
 	}
 	//=====================================================================================
@@ -164,6 +178,7 @@ public class ApiExceptionHandler {
 	        HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase(),
 	        InfrastructureErrorCode.UNSUPPORTED_MEDIA_TYPE,
 	        "Unsupported media type. Please check the Content-Type header",
+	        null,
 	        request.getRequestURI());
 	}
 	//=====================================================================================
@@ -176,20 +191,40 @@ public class ApiExceptionHandler {
 	        HttpStatus.NOT_FOUND.getReasonPhrase(),
 	        InfrastructureErrorCode.ROUTE_NOT_FOUND,
 	        "The requested endpoint does not exist.",
+	        null,
 	        request.getRequestURI());
 	}
-
+	//=====================================================================================
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ApiErrorResponse handleArgumentNotValid(
+			MethodArgumentNotValidException ex,
+			HttpServletRequest request) {
+		Map<String,String> errors = new HashMap<>();
+		ex.getBindingResult()
+		.getFieldErrors()
+		.forEach(erro->errors.put(erro.getField(),erro.getDefaultMessage()));
+		
+		return ApiErrorResponse.of(
+				HttpStatus.BAD_REQUEST.value(),
+				HttpStatus.BAD_REQUEST.getReasonPhrase(),
+				InfrastructureErrorCode.ARGUMENT_NOT_VALID,
+				"One or more arguments are not valid",
+				errors,
+				request.getRequestURI()
+				);
+	}
 	//=====================================================================================
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ApiErrorResponse handleGeneric(Exception ex, HttpServletRequest request) {
-	    
 	    
 	    return ApiErrorResponse.of(
 	        HttpStatus.INTERNAL_SERVER_ERROR.value(),
 	        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
 	        InfrastructureErrorCode.INTERNAL_ERROR,
 	        "An unexpected internal error occurred. Please try again later.",
+	        null,
 	        request.getRequestURI()
 	    );
 	}
