@@ -1,13 +1,12 @@
 package com.miguel.assistencesystem.infrastructure.web.controller.view;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.miguel.assistencesystem.application.dto.response.PageResponse;
 import com.miguel.assistencesystem.application.dto.summary.ClientSummaryDTO;
 import com.miguel.assistencesystem.application.dto.view.ClientViewDTO;
 import com.miguel.assistencesystem.application.query.search.ClientSearchService;
@@ -63,7 +62,7 @@ public class ClientViewController {
     // ===== Search (navigation) =====
 
     @GetMapping("/search")
-    public List<ClientSummaryDTO> searchClientByName(
+    public PageResponse<ClientSummaryDTO> searchClientByName(
             @RequestParam String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int pageSize) {

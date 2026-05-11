@@ -164,4 +164,21 @@ public class ServiceOrderJpaDAO extends BaseDAO<ServiceOrder, Long>{
                 .getSingleResult();
         return count;
     }
+	
+	public long countByDateRange(LocalDateTime from, LocalDateTime to) {
+		return em.createQuery(
+				"SELECT COUNT(s) FROM ServiceOrder s WHERE s.openedAt BETWEEN :from AND :to",
+				Long.class)
+				.setParameter("from", from)
+				.setParameter("to", to)
+				.getSingleResult();
+	}
+	
+	public long countByProductSerial(String serial){
+		return em.createQuery(
+				"SELECT COUNT(s) FROM ServiceOrder s WHERE s.product.prodId = :serial",
+				Long.class)
+				.setParameter("serial", serial)
+				.getSingleResult();
+	}
 }		

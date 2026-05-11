@@ -48,7 +48,7 @@ public class ClientJpaDAO extends BaseDAO<Client, Long>{
 	    return em.createQuery(
 	            "SELECT c FROM Client c WHERE LOWER(c.name) LIKE LOWER(:name)",
 	            Client.class)
-	            .setParameter("name", "%" + name + "%")
+	            .setParameter("name",name + "%")
 	            .setFirstResult(pageRequest.offset())
 	            .setMaxResults(pageRequest.pageSize())
 	            .getResultList();	    
@@ -81,5 +81,12 @@ public class ClientJpaDAO extends BaseDAO<Client, Long>{
 	            .setParameter("clientId", id)
 	            .getSingleResult();
 	    return count;     
+	}
+	
+	public long countClientsByName(String name) {
+		return em.createQuery(
+				"SELECT COUNT(c) FROM Client c WHERE LOWER(c.name) LIKE LOWER(:name)",Long.class)
+				.setParameter("name", name + "%")
+				.getSingleResult();
 	}
 }

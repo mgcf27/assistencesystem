@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.miguel.assistencesystem.application.dto.response.PageResponse;
 import com.miguel.assistencesystem.application.dto.summary.ClientSummaryDTO;
 import com.miguel.assistencesystem.domain.exceptions.client.ClientNotFoundException;
 import com.miguel.assistencesystem.domain.valueobjects.PageRequest;
@@ -20,15 +21,26 @@ public class ClientSearchService {
 		this.clientDAO = clientDAO;
 	}
 
-    public List<ClientSummaryDTO> searchByName(String name, int page, int pageSize) {
-        
+    public PageResponse<ClientSummaryDTO> searchByName(String name, int page, int pageSize) { 
         PageRequest pr = new PageRequest(page, pageSize);
-        	
-        return clientDAO.findByName(name, pr).stream()
+        
+        List<ClientSummaryDTO> clientSummaryList = clientDAO.findByName(name, pr).stream()
                 .map(ClientSummaryDTO::fromEntity)
                 .toList();
         
+        long totalItems = clientDAO.countClientsByName(name);
         
+        int totalPages = (int) Math.ceil((double) totalItems/pr.pageSize());
+        
+        PageResponse<ClientSummaryDTO> pageResponse = new PageResponse<>(
+        		clientSummaryList,
+        		pr.page(),
+        		pr.pageSize(),
+        		totalItems,
+        		totalPages	
+        		);
+        
+        return pageResponse;
     }
 
     public ClientSummaryDTO searchByCpf(String cpf) {
