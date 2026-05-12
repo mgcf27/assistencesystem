@@ -1,8 +1,10 @@
 package com.miguel.assistencesystem.infrastructure.web.filter;
 
 import java.io.IOException;
-import java.util.UUID;
-import org.slf4j.MDC;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -13,10 +15,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.LOWEST_PRECEDENCE)
 @Component
-public class RequestCorrelationFilter extends OncePerRequestFilter {
-	private static final String REQUEST_ID_HEADER = "X-Request-Id";
+public class RequestLoggingFilter extends OncePerRequestFilter {
+	private static final Logger logger =
+	        LoggerFactory.getLogger(RequestLoggingFilter.class);
+	
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
@@ -24,19 +28,27 @@ public class RequestCorrelationFilter extends OncePerRequestFilter {
 			FilterChain filterChain)
 			throws ServletException, IOException {
 		
-		String requestId = request.getHeader(REQUEST_ID_HEADER);
+		long startTime = System.currentTimeMillis();
 		
-		try{
-			if(requestId == null || requestId.trim().isEmpty()) {
-				requestId = UUID.randomUUID().toString();
-			}
-			MDC.put("requestId", requestId);
-			
-			response.setHeader(REQUEST_ID_HEADER, requestId);
-			
+		String method = request.getMethod();
+		
+		String uri = request.getRequestURI();
+		
+		try {
 			filterChain.doFilter(request, response);
 		}finally {
-			MDC.remove("requestId");
-		}	
+			int httpStatus = response.getStatus();
+			
+			long duration = System.currentTimeMillis() - startTime;
+			
+			logger.info(
+					"Request completed method={} path={} status={} durationMs={}",
+				    method,
+				    uri,
+				    httpStatus,
+				    duration
+					);		
+		}		
 	}
+
 }
